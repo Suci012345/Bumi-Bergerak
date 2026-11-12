@@ -1,0 +1,670 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Bumi Bergerak</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;700;800&display=swap">
+<style>
+/* Layout: one reading column with two views (Materi, Kuis) switched from a tab bar. Simulations sit inline in the lesson. */
+:root{
+  --bg:#eef3fa; --surface:#ffffff; --ink:#12223d; --muted:#4d5d79; --line:#d2dded;
+  --sun:#f08a00; --sun-soft:#fff0d6; --on-sun:#1a1200;
+  --sea:#1f6fd6; --sea-soft:#e2edfc;
+  --leaf:#12875a; --leaf-soft:#dcf3e8;
+  --bad:#c9372f; --bad-soft:#fde6e4;
+  --space:#16233f; --space-ink:#eaf0fb;
+  --f-display:'Fredoka',system-ui,sans-serif;
+  --f-body:'Nunito',system-ui,-apple-system,'Segoe UI',sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0a1224; --surface:#121d36; --ink:#eaf0fb; --muted:#9db0cf; --line:#26375c;
+    --sun:#ffb02e; --sun-soft:#3a2c0d; --on-sun:#1a1200;
+    --sea:#6aa8ff; --sea-soft:#162a4d;
+    --leaf:#4cd08c; --leaf-soft:#12362a;
+    --bad:#ff7a72; --bad-soft:#40191a;
+    --space:#050b18; --space-ink:#eaf0fb;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0a1224; --surface:#121d36; --ink:#eaf0fb; --muted:#9db0cf; --line:#26375c;
+  --sun:#ffb02e; --sun-soft:#3a2c0d; --on-sun:#1a1200;
+  --sea:#6aa8ff; --sea-soft:#162a4d;
+  --leaf:#4cd08c; --leaf-soft:#12362a;
+  --bad:#ff7a72; --bad-soft:#40191a;
+  --space:#050b18; --space-ink:#eaf0fb;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{
+  background:var(--bg); color:var(--ink);
+  font-family:var(--f-body); font-size:17px; line-height:1.6;
+  padding-block:20px 56px;
+  padding-left:max(16px, env(safe-area-inset-left, 0px));
+  padding-right:max(16px, env(safe-area-inset-right, 0px));
+}
+.wrap{max-width:900px; margin-inline:auto; display:flex; flex-direction:column; gap:28px}
+h1,h2,h3{font-family:var(--f-display); line-height:1.15; margin:0; text-wrap:balance; font-weight:600}
+h1{font-size:clamp(2rem,6vw,3.1rem)}
+h2{font-size:clamp(1.5rem,4vw,2rem)}
+h3{font-size:1.2rem}
+p{margin:0}
+.eyebrow{font-size:.78rem; font-weight:800; letter-spacing:.12em; text-transform:uppercase; color:var(--sea)}
+button{font:inherit; color:inherit; cursor:pointer}
+:focus-visible{outline:3px solid var(--sea); outline-offset:2px}
+
+/* top bar */
+.topbar{display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap}
+.brand{display:flex; align-items:center; gap:10px; font-family:var(--f-display); font-weight:600; font-size:1.25rem}
+.tabs{display:flex; gap:6px; background:var(--surface); border:1px solid var(--line); border-radius:999px; padding:4px}
+.tab{border:0; background:transparent; padding:8px 18px; border-radius:999px; font-weight:800; color:var(--muted)}
+.tab[aria-selected="true"]{background:var(--ink); color:var(--bg)}
+
+/* hero */
+.hero{display:grid; grid-template-columns:1.3fr 1fr; gap:24px; align-items:center}
+.hero p.lead{font-size:1.1rem; color:var(--muted); margin-top:12px; max-width:46ch}
+.facts{display:grid; gap:10px; margin:0; padding:0; list-style:none}
+.facts li{display:flex; align-items:baseline; justify-content:space-between; gap:12px; background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:10px 14px}
+.facts b{font-family:var(--f-display); font-size:1.15rem}
+.facts span{color:var(--muted); font-size:.9rem}
+.toc{display:flex; flex-wrap:wrap; gap:8px}
+.chip{border:1px solid var(--line); background:var(--surface); border-radius:999px; padding:6px 14px; font-weight:700; font-size:.92rem}
+.chip:hover{border-color:var(--sea)}
+
+/* lesson blocks */
+.sec{display:flex; flex-direction:column; gap:14px; scroll-margin-top:12px}
+.card{background:var(--surface); border:1px solid var(--line); border-radius:18px; padding:20px; display:flex; flex-direction:column; gap:12px; min-width:0}
+.grid2{display:grid; grid-template-columns:1fr 1fr; gap:14px}
+.grid2 > *{min-width:0}
+.def{background:var(--sea-soft); border-radius:14px; padding:14px 16px}
+.def b{color:var(--sea)}
+.ingat{background:var(--sun-soft); border-radius:14px; padding:14px 16px}
+.ingat .tag{font-family:var(--f-display); font-weight:600; color:var(--sun); display:block; margin-bottom:2px}
+ul.pts{margin:0; padding-left:1.2em; display:flex; flex-direction:column; gap:8px}
+ul.pts li::marker{color:var(--sun)}
+.tbl{overflow-x:auto; border:1px solid var(--line); border-radius:14px; background:var(--surface)}
+table{border-collapse:collapse; width:100%; min-width:520px; font-size:.95rem}
+th,td{text-align:left; padding:10px 14px; border-bottom:1px solid var(--line); vertical-align:top}
+th{background:var(--sea-soft); font-weight:800}
+tr:last-child td{border-bottom:0}
+.num{font-variant-numeric:tabular-nums}
+
+/* simulations */
+.sim{display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:16px; align-items:center}
+.sim svg{width:100%; height:auto; display:block; background:var(--space); border-radius:14px}
+.sim .ctl{display:flex; flex-direction:column; gap:10px}
+.readout{background:var(--bg); border:1px solid var(--line); border-radius:12px; padding:10px 12px; min-height:5.2em}
+.readout b{font-family:var(--f-display)}
+input[type=range]{width:100%; accent-color:var(--sun)}
+.btnrow{display:flex; flex-wrap:wrap; gap:8px}
+.btn{border:0; border-radius:12px; padding:10px 18px; font-weight:800; background:var(--sun); color:var(--on-sun)}
+.btn:hover{filter:brightness(1.06)}
+.btn.ghost{background:transparent; color:var(--ink); border:2px solid var(--line)}
+.btn.ghost:hover{border-color:var(--sea)}
+.btn.pick{background:var(--surface); color:var(--ink); border:2px solid var(--line); padding:8px 12px; font-size:.9rem}
+.btn.pick[aria-pressed="true"]{border-color:var(--sun); background:var(--sun-soft)}
+.s-ink{fill:var(--space-ink)}
+.s-note{font:700 11px var(--f-body); fill:var(--space-ink)}
+
+/* quiz */
+.qhead{display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap}
+.stat{display:flex; gap:8px; flex-wrap:wrap}
+.pill{background:var(--surface); border:1px solid var(--line); border-radius:999px; padding:4px 12px; font-weight:800; font-size:.9rem}
+.pill b{font-variant-numeric:tabular-nums}
+.bar{height:12px; background:var(--line); border-radius:99px; overflow:hidden}
+.bar i{display:block; height:100%; width:0; background:linear-gradient(90deg,var(--sea),var(--sun)); border-radius:99px; transition:width .35s}
+.level{align-self:flex-start; background:var(--sea-soft); color:var(--sea); border-radius:999px; padding:3px 12px; font-weight:800; font-size:.82rem}
+.q{font-family:var(--f-display); font-size:clamp(1.25rem,3.6vw,1.65rem); line-height:1.3; font-weight:500}
+.opts{display:grid; gap:10px}
+.opt{display:flex; gap:12px; align-items:center; text-align:left; background:var(--surface); border:2px solid var(--line); border-radius:14px; padding:12px 14px; font-weight:700; width:100%}
+.opt .k{flex:none; width:30px; height:30px; border-radius:50%; background:var(--sea-soft); color:var(--sea); display:grid; place-items:center; font-weight:800; font-size:.9rem}
+.opt:hover:not(:disabled){border-color:var(--sea)}
+.opt:disabled{cursor:default}
+.opt.right{border-color:var(--leaf); background:var(--leaf-soft)}
+.opt.right .k{background:var(--leaf); color:var(--surface)}
+.opt.wrong{border-color:var(--bad); background:var(--bad-soft)}
+.opt.wrong .k{background:var(--bad); color:var(--surface)}
+.opt.dim{opacity:.55}
+.fb{border-radius:14px; padding:14px 16px; display:flex; flex-direction:column; gap:10px}
+.fb.ok{background:var(--leaf-soft)}
+.fb.no{background:var(--bad-soft)}
+.fb strong{font-family:var(--f-display); font-size:1.1rem}
+.stars{font-size:2.2rem; letter-spacing:.2em; color:var(--sun)}
+.stars .off{color:var(--line)}
+.score-big{font-family:var(--f-display); font-size:3.4rem; line-height:1}
+.review{display:flex; flex-direction:column; gap:10px; margin:0; padding:0; list-style:none}
+.review li{border:1px solid var(--line); border-radius:12px; padding:10px 14px; background:var(--surface)}
+.review small{color:var(--muted); display:block}
+.lv{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px}
+.lv div{background:var(--bg); border:1px solid var(--line); border-radius:12px; padding:10px 12px}
+.lv b{font-family:var(--f-display); font-size:1.3rem; display:block}
+.muted{color:var(--muted)}
+
+@media (max-width:680px){
+  .hero,.grid2,.sim{grid-template-columns:1fr}
+  body{font-size:16px}
+  .lv{grid-template-columns:1fr}
+}
+@media (prefers-reduced-motion: reduce){ .bar i{transition:none} }
+</style>
+<div class="wrap">
+<header class="topbar">
+  <div class="brand">
+    <svg width="34" height="34" viewBox="0 0 34 34" aria-hidden="true"><ellipse cx="17" cy="17" rx="15" ry="9" fill="none" stroke="var(--line)" stroke-width="2"/><circle cx="17" cy="17" r="5" fill="var(--sun)"/><circle cx="30" cy="14" r="3.5" fill="var(--sea)"/></svg>
+    Bumi Bergerak
+  </div>
+  <nav class="tabs" aria-label="Pilih halaman">
+    <button class="tab" id="tab-materi" aria-selected="true">Materi</button>
+    <button class="tab" id="tab-kuis" aria-selected="false">Kuis 25 Soal</button>
+  </nav>
+</header>
+
+<main id="view-materi" class="wrap" style="gap:34px">
+
+  <section class="hero">
+    <div>
+      <span class="eyebrow">IPAS Kelas 6 SD</span>
+      <h1 style="margin-top:6px">Rotasi dan Revolusi Bumi</h1>
+      <p class="lead">Bumi tidak pernah diam. Baca materinya dulu, coba dua simulasinya, lalu uji dirimu dengan 25 soal kuis.</p>
+    </div>
+    <ul class="facts" aria-label="Angka penting">
+      <li><span>1 kali rotasi</span><b class="num">± 24 jam</b></li>
+      <li><span>1 kali revolusi</span><b class="num">365¼ hari</b></li>
+      <li><span>Kemiringan sumbu</span><b class="num">23,5°</b></li>
+    </ul>
+  </section>
+
+  <div class="toc" aria-label="Loncat ke bagian">
+    <button class="chip" data-go="s-rotasi">Rotasi</button>
+    <button class="chip" data-go="s-waktu">Zona waktu</button>
+    <button class="chip" data-go="s-revolusi">Revolusi</button>
+    <button class="chip" data-go="s-kabisat">Tahun kabisat</button>
+    <button class="chip" data-go="s-banding">Perbandingan</button>
+    <button class="chip" data-go="s-ringkas">Ringkasan</button>
+  </div>
+
+  <section class="sec" id="s-rotasi">
+    <span class="eyebrow">Bagian 1</span>
+    <h2>Rotasi Bumi</h2>
+    <div class="def"><b>Rotasi Bumi</b> adalah perputaran Bumi pada porosnya. Poros Bumi adalah garis khayal yang menghubungkan Kutub Utara dan Kutub Selatan melalui pusat Bumi.</div>
+    <div class="grid2">
+      <div class="card">
+        <h3>Ciri-ciri rotasi</h3>
+        <ul class="pts">
+          <li>Arahnya dari <b>barat ke timur</b> (berlawanan arah jarum jam jika dilihat dari atas Kutub Utara).</li>
+          <li>Satu kali putaran penuh disebut <b>kala rotasi</b>, yaitu sekitar <b>24 jam</b> atau 1 hari. Lebih tepatnya 23 jam 56 menit.</li>
+          <li>Dalam 24 jam Bumi berputar 360°, jadi tiap 1 jam Bumi berputar <b>15°</b> (360° : 24).</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Akibat rotasi Bumi</h3>
+        <ul class="pts">
+          <li><b>Pergantian siang dan malam.</b> Bagian Bumi yang menghadap Matahari mengalami siang, bagian yang membelakangi mengalami malam.</li>
+          <li><b>Perbedaan waktu</b> di berbagai tempat di Bumi.</li>
+          <li><b>Gerak semu harian Matahari.</b> Matahari tampak terbit di timur dan terbenam di barat, padahal Bumi yang berputar.</li>
+          <li><b>Pembelokan arah angin.</b></li>
+          <li><b>Bentuk Bumi pepat</b> (sedikit gepeng di kutub).</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Simulasi 1: Siang dan malam</h3>
+      <p class="muted">Geser jam untuk memutar Bumi. Titik oranye <b>ID</b> adalah Indonesia. Gambar dilihat dari atas Kutub Utara, Matahari ada di kiri.</p>
+      <div class="sim">
+        <svg viewBox="0 0 320 260" role="img" aria-label="Bumi berotasi, sisi kiri menghadap Matahari">
+          <circle cx="36" cy="130" r="22" fill="#ffb02e"/>
+          <g stroke="#ffb02e" stroke-width="2" stroke-linecap="round" opacity=".7">
+            <line x1="68" y1="70" x2="120" y2="70"/><line x1="64" y1="100" x2="112" y2="100"/>
+            <line x1="62" y1="130" x2="100" y2="130"/><line x1="64" y1="160" x2="112" y2="160"/>
+            <line x1="68" y1="190" x2="120" y2="190"/>
+          </g>
+          <circle cx="200" cy="130" r="80" fill="#2c7be5"/>
+          <g id="earthSpin">
+            <ellipse cx="228" cy="104" rx="20" ry="12" fill="#3fae6a"/>
+            <ellipse cx="176" cy="160" rx="16" ry="10" fill="#3fae6a"/>
+            <ellipse cx="190" cy="92" rx="12" ry="8" fill="#3fae6a"/>
+          </g>
+          <path d="M200 50 A80 80 0 0 1 200 210 Z" fill="#050b18" opacity=".62"/>
+          <circle cx="200" cy="130" r="80" fill="none" stroke="#9db0cf" stroke-width="1.5" opacity=".6"/>
+          <g id="idDot"><circle r="11" fill="#ffb02e" stroke="#1a1200" stroke-width="2"/><text y="4" text-anchor="middle" font-size="10" font-weight="800" fill="#1a1200" font-family="Nunito,sans-serif">ID</text></g>
+          <text class="s-note" x="200" y="38" text-anchor="middle">arah rotasi: barat ke timur ↺</text>
+          <text class="s-note" x="200" y="236" text-anchor="middle">sisi gelap = malam</text>
+        </svg>
+        <div class="ctl">
+          <label for="hourRange"><b>Jam setempat:</b> <span id="hourLabel" class="num">12.00</span></label>
+          <input type="range" id="hourRange" min="0" max="24" step="1" value="12">
+          <div class="readout" id="hourRead" aria-live="polite"></div>
+          <div class="btnrow"><button class="btn ghost" id="playRot" type="button">Putar otomatis</button></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="s-waktu">
+    <span class="eyebrow">Akibat rotasi</span>
+    <h2>Perbedaan waktu di Indonesia</h2>
+    <p>Karena Bumi berputar dari barat ke timur, daerah di timur lebih dulu terkena sinar Matahari. Itu sebabnya waktu di timur lebih cepat. Indonesia membentang sekitar 46° garis bujur (dari 95° BT sampai 141° BT). Dengan 15° untuk tiap jam, selisihnya sekitar 3 jam, sehingga Indonesia dibagi menjadi <b>3 zona waktu</b>.</p>
+    <div class="tbl">
+      <table>
+        <thead><tr><th>Zona</th><th>Kepanjangan</th><th>Selisih dengan WIB</th><th>Contoh daerah</th></tr></thead>
+        <tbody>
+          <tr><td><b>WIB</b></td><td>Waktu Indonesia Barat</td><td class="num">0 jam (acuan)</td><td>Sumatera, Jawa, Kalimantan Barat dan Tengah</td></tr>
+          <tr><td><b>WITA</b></td><td>Waktu Indonesia Tengah</td><td class="num">+1 jam</td><td>Bali, NTB, NTT, Sulawesi, Kalimantan Selatan, Timur, Utara</td></tr>
+          <tr><td><b>WIT</b></td><td>Waktu Indonesia Timur</td><td class="num">+2 jam</td><td>Maluku dan Papua</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="ingat"><span class="tag">Contoh menghitung</span>Jika di Bandung (WIB) pukul 08.00, maka di Makassar (WITA) pukul 09.00 dan di Jayapura (WIT) pukul 10.00. Ke arah timur ditambah, ke arah barat dikurangi.</div>
+  </section>
+
+  <section class="sec" id="s-revolusi">
+    <span class="eyebrow">Bagian 2</span>
+    <h2>Revolusi Bumi</h2>
+    <div class="def"><b>Revolusi Bumi</b> adalah peredaran Bumi mengelilingi Matahari pada lintasan berbentuk elips (lonjong), dengan arah berlawanan jarum jam jika dilihat dari atas Kutub Utara.</div>
+    <div class="grid2">
+      <div class="card">
+        <h3>Ciri-ciri revolusi</h3>
+        <ul class="pts">
+          <li>Satu kali putaran penuh disebut <b>kala revolusi</b>, yaitu <b>365¼ hari</b> (365 hari 6 jam) atau 1 tahun.</li>
+          <li>Sumbu Bumi <b>miring 23,5°</b> dan selalu menunjuk arah yang sama selama Bumi beredar.</li>
+          <li>Lintasan Bumi disebut <b>orbit</b>. Jarak Bumi ke Matahari rata-rata sekitar 150 juta km.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Akibat revolusi Bumi</h3>
+        <ul class="pts">
+          <li><b>Pergantian musim</b> (karena revolusi digabung dengan sumbu Bumi yang miring).</li>
+          <li><b>Perbedaan lama siang dan malam</b> di sepanjang tahun, terutama di daerah dekat kutub.</li>
+          <li><b>Gerak semu tahunan Matahari.</b> Matahari tampak bergeser antara 23,5° Lintang Utara dan 23,5° Lintang Selatan.</li>
+          <li><b>Rasi bintang yang tampak di malam hari berubah</b> dari bulan ke bulan.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Simulasi 2: Musim</h3>
+      <p class="muted">Pilih tanggal untuk memindahkan Bumi di orbitnya. Perhatikan ujung sumbu bertanda <b>U</b> (Utara). Ia selalu miring ke arah yang sama.</p>
+      <div class="sim">
+        <svg viewBox="0 0 320 250" role="img" aria-label="Bumi mengelilingi Matahari dengan sumbu miring">
+          <ellipse cx="160" cy="125" rx="124" ry="86" fill="none" stroke="#9db0cf" stroke-width="1.5" stroke-dasharray="4 5"/>
+          <circle cx="160" cy="125" r="24" fill="#ffb02e"/>
+          <circle cx="160" cy="125" r="32" fill="none" stroke="#ffb02e" stroke-width="2" opacity=".35"/>
+          <g id="orbitEarth">
+            <line id="axisLine" x1="0" y1="0" x2="0" y2="0" stroke="#eaf0fb" stroke-width="2"/>
+            <circle r="13" fill="#2c7be5" stroke="#eaf0fb" stroke-width="1.5"/>
+            <ellipse cx="-3" cy="-3" rx="6" ry="4" fill="#3fae6a"/>
+            <text id="nLabel" font-size="11" font-weight="800" fill="#ffb02e" font-family="Nunito,sans-serif" text-anchor="middle">U</text>
+          </g>
+          <text class="s-note" x="160" y="125" text-anchor="middle" dy="3" fill="#1a1200" style="fill:#1a1200">Matahari</text>
+          <text class="s-note" x="12" y="238">Bumi bergerak berlawanan arah jarum jam ↺</text>
+        </svg>
+        <div class="ctl">
+          <div class="btnrow" role="group" aria-label="Pilih tanggal">
+            <button class="btn pick" type="button" data-d="0" aria-pressed="false">21 Maret</button>
+            <button class="btn pick" type="button" data-d="1" aria-pressed="true">21 Juni</button>
+            <button class="btn pick" type="button" data-d="2" aria-pressed="false">23 September</button>
+            <button class="btn pick" type="button" data-d="3" aria-pressed="false">22 Desember</button>
+          </div>
+          <div class="readout" id="seasonRead" aria-live="polite"></div>
+        </div>
+      </div>
+      <div class="ingat"><span class="tag">Indonesia di khatulistiwa</span>Indonesia dilalui garis khatulistiwa, jadi panjang siang dan malam hampir sama sepanjang tahun. Kita hanya punya <b>dua musim</b>: musim hujan dan musim kemarau. Empat musim (semi, panas, gugur, dingin) ada di daerah subtropis.</div>
+    </div>
+  </section>
+
+  <section class="sec" id="s-kabisat">
+    <span class="eyebrow">Akibat revolusi</span>
+    <h2>Tahun kabisat</h2>
+    <p>Satu tahun sebenarnya 365 hari 6 jam. Kalender hanya memakai 365 hari, jadi sisa 6 jam menumpuk setiap tahun. Setelah 4 tahun, sisanya <span class="num">4 × 6 jam = 24 jam</span> atau 1 hari penuh. Hari tambahan itu diletakkan di bulan Februari.</p>
+    <div class="grid2">
+      <div class="card"><h3>Tahun biasa</h3><p><b class="num">365 hari</b>. Februari punya 28 hari.</p></div>
+      <div class="card"><h3>Tahun kabisat</h3><p><b class="num">366 hari</b>. Februari punya 29 hari. Terjadi setiap 4 tahun, contohnya 2024, 2028, dan 2032 (tahunnya habis dibagi 4).</p></div>
+    </div>
+  </section>
+
+  <section class="sec" id="s-banding">
+    <span class="eyebrow">Rangkuman</span>
+    <h2>Rotasi dan revolusi, apa bedanya?</h2>
+    <div class="tbl">
+      <table>
+        <thead><tr><th></th><th>Rotasi</th><th>Revolusi</th></tr></thead>
+        <tbody>
+          <tr><td><b>Gerakan</b></td><td>Berputar pada porosnya</td><td>Mengelilingi Matahari</td></tr>
+          <tr><td><b>Arah</b></td><td>Barat ke timur</td><td>Berlawanan arah jarum jam (dari atas Kutub Utara)</td></tr>
+          <tr><td><b>Waktu satu putaran</b></td><td class="num">± 24 jam (1 hari)</td><td class="num">365¼ hari (1 tahun)</td></tr>
+          <tr><td><b>Akibat</b></td><td>Siang dan malam, perbedaan waktu, gerak semu harian Matahari, pembelokan arah angin</td><td>Pergantian musim, perbedaan lama siang dan malam, gerak semu tahunan Matahari, tahun kabisat</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="ingat"><span class="tag">Tahukah kamu?</span>Di khatulistiwa, permukaan Bumi bergerak sekitar 1.670 km per jam karena rotasi. Dalam revolusi, Bumi melaju sekitar 107.000 km per jam. Kita tidak merasakannya karena Bumi bergerak dengan kecepatan yang stabil, sama seperti penumpang pesawat yang tenang di udara.</div>
+  </section>
+
+  <section class="sec" id="s-ringkas">
+    <span class="eyebrow">Sebelum kuis</span>
+    <h2>Lima hal yang harus diingat</h2>
+    <ul class="pts card">
+      <li>Rotasi = berputar pada poros, 24 jam, barat ke timur.</li>
+      <li>Rotasi menyebabkan siang-malam dan perbedaan waktu (15° per jam).</li>
+      <li>Revolusi = mengelilingi Matahari, 365¼ hari.</li>
+      <li>Revolusi + sumbu miring 23,5° menyebabkan pergantian musim.</li>
+      <li>Tahun kabisat 366 hari, terjadi tiap 4 tahun.</li>
+    </ul>
+    <div class="btnrow"><button class="btn" type="button" id="startFromMateri">Saya siap, mulai kuis</button></div>
+  </section>
+</main>
+
+<main id="view-kuis" class="wrap" hidden>
+
+  <section id="qIntro" class="card">
+    <span class="eyebrow">Kuis</span>
+    <h2>Siap menguji Bumi di kepalamu?</h2>
+    <p>25 soal pilihan ganda dalam 3 level. Tiap jawaban benar bernilai 4 poin, nilai maksimal 100. Setelah menjawab, kamu langsung melihat penjelasannya.</p>
+    <div class="lv">
+      <div><b>Level 1</b><span class="muted">Rotasi · 9 soal</span></div>
+      <div><b>Level 2</b><span class="muted">Revolusi · 11 soal</span></div>
+      <div><b>Level 3</b><span class="muted">Campuran · 5 soal</span></div>
+    </div>
+    <p class="muted" id="bestLine" hidden></p>
+    <div class="btnrow">
+      <button class="btn" type="button" id="startQuiz">Mulai kuis</button>
+      <button class="btn ghost" type="button" id="backMateri">Baca materi lagi</button>
+    </div>
+  </section>
+
+  <section id="qPlay" class="card" hidden>
+    <div class="qhead">
+      <span class="level" id="qLevel"></span>
+      <div class="stat">
+        <span class="pill">Soal <b id="qNo">1</b>/25</span>
+        <span class="pill">Poin <b id="qScore">0</b></span>
+        <span class="pill">Beruntun <b id="qStreak">0</b></span>
+      </div>
+    </div>
+    <div class="bar" role="progressbar" aria-label="Kemajuan kuis" aria-valuemin="0" aria-valuemax="25" id="qBarWrap"><i id="qBar"></i></div>
+    <p class="q" id="qText"></p>
+    <div class="opts" id="qOpts"></div>
+    <div class="fb" id="qFb" hidden aria-live="polite">
+      <strong id="qFbTitle"></strong>
+      <p id="qFbText"></p>
+      <div class="btnrow"><button class="btn" type="button" id="qNext">Soal berikutnya</button></div>
+    </div>
+  </section>
+
+  <section id="qEnd" class="card" hidden>
+    <span class="eyebrow">Hasil kuis</span>
+    <div class="stars" id="eStars" aria-hidden="true"></div>
+    <h2 id="eTitle"></h2>
+    <div class="score-big"><span id="eScore" class="num">0</span><span class="muted" style="font-size:1.2rem"> / 100</span></div>
+    <p id="eMsg"></p>
+    <div class="lv" id="eLv"></div>
+    <div id="eReviewWrap" hidden>
+      <h3 style="margin-bottom:10px">Soal yang perlu dipelajari lagi</h3>
+      <ul class="review" id="eReview"></ul>
+    </div>
+    <div class="btnrow">
+      <button class="btn" type="button" id="again">Main lagi</button>
+      <button class="btn ghost" type="button" id="toMateri2">Buka materi</button>
+    </div>
+  </section>
+
+</main>
+</div>
+<script>
+/* Soal: a[0] adalah jawaban benar, urutan pilihan diacak saat main. lv: 0 Rotasi, 1 Revolusi, 2 Campuran */
+var QUESTIONS = [
+ {lv:0,q:"Perputaran Bumi pada porosnya disebut ...",a:["rotasi","revolusi","gerhana","gravitasi"],e:"Rotasi adalah perputaran Bumi pada porosnya. Peredaran Bumi mengelilingi Matahari disebut revolusi."},
+ {lv:0,q:"Rotasi Bumi berlangsung dari arah ...",a:["barat ke timur","timur ke barat","utara ke selatan","selatan ke utara"],e:"Bumi berotasi dari barat ke timur, berlawanan arah jarum jam jika dilihat dari atas Kutub Utara."},
+ {lv:0,q:"Satu kali rotasi Bumi memerlukan waktu sekitar ...",a:["24 jam","12 jam","30 hari","365 hari"],e:"Kala rotasi Bumi sekitar 24 jam atau 1 hari. Itulah sebabnya satu hari ada 24 jam."},
+ {lv:0,q:"Pergantian siang dan malam disebabkan oleh ...",a:["rotasi Bumi","revolusi Bumi","Matahari yang mengelilingi Bumi","kemiringan Bulan"],e:"Karena Bumi berotasi, bagian yang menghadap Matahari mengalami siang dan bagian yang membelakanginya mengalami malam."},
+ {lv:0,q:"Matahari tampak terbit di arah ...",a:["timur","barat","utara","selatan"],e:"Bumi berputar dari barat ke timur, sehingga Matahari tampak terbit di timur dan terbenam di barat. Ini disebut gerak semu harian Matahari."},
+ {lv:0,q:"Dalam 1 jam, Bumi berotasi sejauh ...",a:["15°","30°","24°","360°"],e:"Dalam 24 jam Bumi berputar 360°. Jadi tiap jam: 360° : 24 = 15°."},
+ {lv:0,q:"Indonesia dibagi menjadi tiga zona waktu, yaitu ...",a:["WIB, WITA, dan WIT","WIB, WIT, dan WIL","WIA, WITA, dan WIT","WIB, WITA, dan WIS"],e:"Tiga zona waktu Indonesia: WIB (Barat), WITA (Tengah), dan WIT (Timur)."},
+ {lv:0,q:"Pukul 10.00 WIB di Jakarta. Pada saat yang sama di Makassar (WITA) pukul ...",a:["11.00","09.00","12.00","10.00"],e:"WITA lebih cepat 1 jam dari WIB. Jadi 10.00 + 1 jam = 11.00 WITA."},
+ {lv:0,q:"Pukul 07.00 WIB di Bandung. Pada saat yang sama di Jayapura (WIT) pukul ...",a:["09.00","08.00","06.00","05.00"],e:"WIT lebih cepat 2 jam dari WIB. Jadi 07.00 + 2 jam = 09.00 WIT."},
+
+ {lv:1,q:"Peredaran Bumi mengelilingi Matahari disebut ...",a:["revolusi","rotasi","rotasi Bulan","gerhana"],e:"Revolusi Bumi adalah peredaran Bumi mengelilingi Matahari."},
+ {lv:1,q:"Kala revolusi Bumi adalah sekitar ...",a:["365¼ hari","24 jam","30 hari","7 hari"],e:"Satu kali revolusi memerlukan 365¼ hari (365 hari 6 jam), yaitu 1 tahun."},
+ {lv:1,q:"Berikut ini yang merupakan akibat revolusi Bumi adalah ...",a:["pergantian musim","pergantian siang dan malam","perbedaan waktu WIB dan WIT","Matahari tampak terbit dari timur"],e:"Pergantian musim adalah akibat revolusi. Tiga pilihan lainnya adalah akibat rotasi Bumi."},
+ {lv:1,q:"Pergantian musim terjadi karena revolusi Bumi dan ...",a:["sumbu Bumi yang miring","Bumi yang datar","jarak Bulan yang berubah","Bumi yang berhenti berotasi"],e:"Sumbu Bumi miring 23,5°. Saat Bumi mengelilingi Matahari, bagian Bumi yang condong ke Matahari mengalami musim panas."},
+ {lv:1,q:"Sumbu Bumi miring sekitar ...",a:["23,5°","90°","45°","0°"],e:"Sumbu Bumi miring sekitar 23,5° terhadap garis tegak lurus bidang orbitnya."},
+ {lv:1,q:"Berapa jumlah hari dalam satu tahun kabisat?",a:["366 hari","365 hari","364 hari","367 hari"],e:"Tahun kabisat punya 366 hari karena ada tambahan 1 hari di bulan Februari."},
+ {lv:1,q:"Pada tahun kabisat, bulan Februari berjumlah ...",a:["29 hari","28 hari","30 hari","31 hari"],e:"Februari biasanya 28 hari. Pada tahun kabisat bertambah menjadi 29 hari."},
+ {lv:1,q:"Tahun kabisat terjadi setiap ...",a:["4 tahun","2 tahun","5 tahun","10 tahun"],e:"Sisa 6 jam tiap tahun menumpuk. Setelah 4 tahun jumlahnya 24 jam, yaitu 1 hari penuh."},
+ {lv:1,q:"Musim yang dialami Indonesia adalah ...",a:["hujan dan kemarau","semi, panas, gugur, dan dingin","hanya musim panas","hanya musim dingin"],e:"Indonesia dilalui khatulistiwa (daerah tropis), jadi hanya punya musim hujan dan musim kemarau."},
+ {lv:1,q:"Gerak semu tahunan Matahari berarti ...",a:["Matahari tampak bergeser antara 23,5° LU dan 23,5° LS sepanjang tahun","Matahari tampak terbit dan terbenam setiap hari","Matahari sungguh-sungguh mengelilingi Bumi","Matahari menghilang pada musim tertentu"],e:"Akibat revolusi Bumi dan sumbu yang miring, posisi Matahari di langit tampak bergeser ke utara dan selatan sepanjang tahun."},
+ {lv:1,q:"Rasi bintang yang tampak di malam hari berubah dari bulan ke bulan karena ...",a:["Bumi berevolusi mengelilingi Matahari","Bumi berotasi lebih cepat","bintang berpindah tempat tiap bulan","Bulan menutupi bintang"],e:"Saat Bumi berevolusi, arah pandang kita ke langit malam berubah, sehingga rasi bintang yang tampak pun berganti."},
+
+ {lv:2,q:"Dalam satu tahun (365 hari), Bumi berotasi sekitar ...",a:["365 kali","24 kali","12 kali","1 kali"],e:"Tiap hari Bumi berotasi satu kali. Selama 365 hari, rotasinya sekitar 365 kali sementara revolusinya 1 kali."},
+ {lv:2,q:"Pasangan gerakan Bumi dan akibatnya yang benar adalah ...",a:["rotasi: siang dan malam","rotasi: pergantian musim","revolusi: siang dan malam","revolusi: perbedaan waktu WIB dan WIT"],e:"Rotasi menyebabkan siang dan malam. Pergantian musim adalah akibat revolusi."},
+ {lv:2,q:"Pernyataan yang benar tentang gerakan Bumi adalah ...",a:["Bumi berotasi dan berevolusi pada saat yang sama","Bumi hanya berotasi, tidak berevolusi","Bumi hanya berevolusi, tidak berotasi","Bumi diam, Matahari yang bergerak"],e:"Bumi berputar pada porosnya (rotasi) sambil mengelilingi Matahari (revolusi), keduanya terjadi bersamaan."},
+ {lv:2,q:"Matahari tampak bergerak dari timur ke barat tiap hari. Penyebab sebenarnya adalah ...",a:["Bumi berotasi dari barat ke timur","Matahari mengelilingi Bumi","Bumi berevolusi sangat cepat","Bulan menarik Matahari"],e:"Gerak itu hanya tampak (semu). Yang sebenarnya bergerak adalah Bumi yang berotasi."},
+ {lv:2,q:"Tahun berikut yang merupakan tahun kabisat adalah ...",a:["2028","2027","2029","2030"],e:"Tahun kabisat habis dibagi 4. Dari pilihan yang ada, hanya 2028 yang habis dibagi 4."}
+];
+var LEVELS = ["Level 1 · Rotasi","Level 2 · Revolusi","Level 3 · Campuran"];
+</script>
+<script>
+(function(){
+  var $ = function(id){ return document.getElementById(id); };
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ---------- navigasi ---------- */
+  function show(view){
+    var kuis = view === 'kuis';
+    $('view-materi').hidden = kuis;
+    $('view-kuis').hidden = !kuis;
+    $('tab-materi').setAttribute('aria-selected', String(!kuis));
+    $('tab-kuis').setAttribute('aria-selected', String(kuis));
+    window.scrollTo(0, 0);
+  }
+  $('tab-materi').onclick = function(){ show('materi'); };
+  $('tab-kuis').onclick = function(){ show('kuis'); };
+  $('startFromMateri').onclick = function(){ show('kuis'); };
+  $('backMateri').onclick = function(){ show('materi'); };
+  $('toMateri2').onclick = function(){ show('materi'); };
+  document.querySelectorAll('[data-go]').forEach(function(b){
+    b.onclick = function(){
+      var el = $(b.getAttribute('data-go'));
+      if (el) el.scrollIntoView({behavior: reduce ? 'auto' : 'smooth', block:'start'});
+    };
+  });
+
+  /* ---------- simulasi 1: rotasi ---------- */
+  var hour = 12, playTimer = null;
+  function pad(n){ return (n < 10 ? '0' : '') + n; }
+  function setHour(h){
+    hour = h;
+    var a = (180 + 15 * (h - 12)) * Math.PI / 180;
+    var x = 200 + 80 * Math.cos(a), y = 130 - 80 * Math.sin(a);
+    $('idDot').setAttribute('transform', 'translate(' + x.toFixed(1) + ' ' + y.toFixed(1) + ')');
+    $('earthSpin').setAttribute('transform', 'rotate(' + (-15 * h) + ' 200 130)');
+    $('hourLabel').textContent = pad(h % 24) + '.00';
+    $('hourRange').value = h;
+    var t;
+    if (h === 6) t = '<b>Matahari terbit di timur.</b> Indonesia baru masuk ke sisi terang. Siang dimulai.';
+    else if (h > 6 && h < 12) t = '<b>Pagi hari.</b> Indonesia menghadap Matahari dan Matahari tampak naik dari timur.';
+    else if (h === 12) t = '<b>Tengah hari.</b> Indonesia menghadap Matahari. Matahari tampak tinggi di langit.';
+    else if (h > 12 && h < 18) t = '<b>Sore hari.</b> Matahari tampak condong ke barat.';
+    else if (h === 18) t = '<b>Matahari terbenam di barat.</b> Indonesia mulai masuk ke sisi gelap.';
+    else t = '<b>Malam hari.</b> Indonesia membelakangi Matahari.';
+    t += '<br><span class="muted">Bumi sudah berputar <span class="num">' + (15 * h) + '°</span> sejak pukul 00.00.</span>';
+    $('hourRead').innerHTML = t;
+  }
+  $('hourRange').oninput = function(){ setHour(parseInt(this.value, 10)); };
+  $('playRot').onclick = function(){
+    if (playTimer){ clearInterval(playTimer); playTimer = null; this.textContent = 'Putar otomatis'; return; }
+    this.textContent = 'Berhenti';
+    playTimer = setInterval(function(){ setHour(hour >= 24 ? 0 : hour + 1); }, 500);
+  };
+  setHour(12);
+
+  /* ---------- simulasi 2: musim ---------- */
+  var TILT = 23.5 * Math.PI / 180;
+  var DIRX = Math.sin(TILT), DIRY = -Math.cos(TILT);
+  var SEASON_ANGLE = [90, 180, 270, 360];
+  var SEASON_TEXT = [
+    '<b>21 Maret.</b> Matahari tepat di atas khatulistiwa. Siang dan malam sama panjang di seluruh Bumi.',
+    '<b>21 Juni.</b> Kutub Utara condong ke Matahari. Belahan utara musim panas (siang lebih panjang), belahan selatan musim dingin.',
+    '<b>23 September.</b> Matahari kembali tepat di atas khatulistiwa. Siang dan malam sama panjang.',
+    '<b>22 Desember.</b> Kutub Utara condong menjauhi Matahari. Belahan selatan musim panas, belahan utara musim dingin.'
+  ];
+  var curAngle = 180, tweenId = null;
+  function placeEarth(deg){
+    var a = deg * Math.PI / 180;
+    var x = 160 + 124 * Math.cos(a), y = 125 - 86 * Math.sin(a);
+    $('orbitEarth').setAttribute('transform', 'translate(' + x.toFixed(1) + ' ' + y.toFixed(1) + ')');
+    var L = $('axisLine');
+    L.setAttribute('x1', (-DIRX * 24).toFixed(1)); L.setAttribute('y1', (-DIRY * 24).toFixed(1));
+    L.setAttribute('x2', (DIRX * 24).toFixed(1));  L.setAttribute('y2', (DIRY * 24).toFixed(1));
+    var N = $('nLabel');
+    N.setAttribute('x', (DIRX * 36).toFixed(1)); N.setAttribute('y', (DIRY * 36 + 4).toFixed(1));
+  }
+  function goSeason(i){
+    document.querySelectorAll('[data-d]').forEach(function(b){
+      b.setAttribute('aria-pressed', String(parseInt(b.getAttribute('data-d'), 10) === i));
+    });
+    $('seasonRead').innerHTML = SEASON_TEXT[i];
+    var target = SEASON_ANGLE[i];
+    var delta = (((target - curAngle) % 360) + 360) % 360;
+    if (tweenId) cancelAnimationFrame(tweenId);
+    if (reduce || delta === 0){ curAngle = target; placeEarth(curAngle); return; }
+    var start = curAngle, t0 = null, dur = 300 + delta * 3;
+    function step(ts){
+      if (t0 === null) t0 = ts;
+      var p = Math.min(1, (ts - t0) / dur);
+      var e = p < .5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2;
+      placeEarth(start + delta * e);
+      if (p < 1) tweenId = requestAnimationFrame(step);
+      else { curAngle = target; tweenId = null; }
+    }
+    tweenId = requestAnimationFrame(step);
+  }
+  document.querySelectorAll('[data-d]').forEach(function(b){
+    b.onclick = function(){ goSeason(parseInt(b.getAttribute('data-d'), 10)); };
+  });
+  placeEarth(180);
+  $('seasonRead').innerHTML = SEASON_TEXT[1];
+
+  /* ---------- kuis ---------- */
+  var order, idx, score, streak, results, locked, bestKey = 'bumi-bergerak-terbaik';
+  function shuffle(arr){
+    for (var i = arr.length - 1; i > 0; i--){
+      var j = Math.floor(Math.random() * (i + 1)), t = arr[i]; arr[i] = arr[j]; arr[j] = t;
+    }
+    return arr;
+  }
+  function readBest(){
+    try { var v = localStorage.getItem(bestKey); return v === null ? null : parseInt(v, 10); } catch (e) { return null; }
+  }
+  function saveBest(v){
+    try { localStorage.setItem(bestKey, String(v)); } catch (e) {}
+  }
+  function showBest(){
+    var b = readBest(), el = $('bestLine');
+    if (b === null || isNaN(b)){ el.hidden = true; return; }
+    el.hidden = false; el.textContent = 'Nilai terbaikmu di perangkat ini: ' + b + ' dari 100.';
+  }
+  function startQuiz(){
+    var groups = [[], [], []];
+    QUESTIONS.forEach(function(q, i){ groups[q.lv].push(i); });
+    order = [];
+    groups.forEach(function(g){ order = order.concat(shuffle(g)); });
+    idx = 0; score = 0; streak = 0; results = []; locked = false;
+    $('qIntro').hidden = true; $('qEnd').hidden = true; $('qPlay').hidden = false;
+    renderQ();
+  }
+  function renderQ(){
+    var q = QUESTIONS[order[idx]];
+    locked = false;
+    $('qLevel').textContent = LEVELS[q.lv];
+    $('qNo').textContent = idx + 1;
+    $('qScore').textContent = score;
+    $('qStreak').textContent = streak;
+    $('qBar').style.width = (idx / QUESTIONS.length * 100) + '%';
+    $('qBarWrap').setAttribute('aria-valuenow', String(idx));
+    $('qText').textContent = q.q;
+    $('qFb').hidden = true;
+    var opts = $('qOpts'); opts.innerHTML = '';
+    var list = shuffle(q.a.map(function(text, i){ return {text: text, ok: i === 0}; }));
+    list.forEach(function(o, i){
+      var b = document.createElement('button');
+      b.type = 'button'; b.className = 'opt';
+      var k = document.createElement('span'); k.className = 'k'; k.textContent = 'ABCD'.charAt(i);
+      var s = document.createElement('span'); s.textContent = o.text;
+      b.appendChild(k); b.appendChild(s);
+      b.onclick = function(){ answer(b, o.ok, q); };
+      b.setAttribute('data-ok', o.ok ? '1' : '0');
+      opts.appendChild(b);
+    });
+    $('qNext').textContent = idx === QUESTIONS.length - 1 ? 'Lihat hasil' : 'Soal berikutnya';
+  }
+  function answer(btn, ok, q){
+    if (locked) return;
+    locked = true;
+    document.querySelectorAll('#qOpts .opt').forEach(function(b){
+      b.disabled = true;
+      if (b.getAttribute('data-ok') === '1') b.classList.add('right');
+      else if (b === btn) b.classList.add('wrong');
+      else b.classList.add('dim');
+    });
+    if (ok){ score += 4; streak += 1; } else { streak = 0; }
+    results.push({i: order[idx], ok: ok});
+    $('qScore').textContent = score;
+    $('qStreak').textContent = streak;
+    var fb = $('qFb');
+    fb.className = 'fb ' + (ok ? 'ok' : 'no');
+    var title = ok ? (streak >= 3 ? 'Benar! ' + streak + ' jawaban beruntun.' : 'Benar!') : 'Belum tepat.';
+    $('qFbTitle').textContent = title;
+    $('qFbText').textContent = q.e;
+    fb.hidden = false;
+    $('qNext').focus();
+  }
+  $('qNext').onclick = function(){
+    if (idx < QUESTIONS.length - 1){ idx += 1; renderQ(); }
+    else finish();
+  };
+  function finish(){
+    $('qBar').style.width = '100%';
+    $('qPlay').hidden = true; $('qEnd').hidden = false;
+    var right = results.filter(function(r){ return r.ok; }).length;
+    var stars = score >= 92 ? 3 : score >= 72 ? 2 : score >= 40 ? 1 : 0;
+    var s = '';
+    for (var i = 0; i < 3; i++) s += i < stars ? '★' : '<span class="off">★</span>';
+    $('eStars').innerHTML = s;
+    $('eScore').textContent = score;
+    var T = [
+      ['Ayo coba lagi!', 'Jangan menyerah. Baca materi sekali lagi, terutama bagian simulasi, lalu main lagi.'],
+      ['Sudah bagus!', 'Kamu sudah memahami dasar rotasi dan revolusi. Periksa soal yang salah di bawah, lalu coba lagi.'],
+      ['Hebat sekali!', 'Hampir sempurna. Pelajari beberapa soal yang masih salah supaya nilaimu penuh.'],
+      ['Juara Bumi!', 'Luar biasa! Kamu menguasai rotasi dan revolusi Bumi.']
+    ];
+    $('eTitle').textContent = T[stars === 0 ? 0 : stars][0];
+    $('eMsg').textContent = right + ' dari ' + QUESTIONS.length + ' soal terjawab benar. ' + T[stars === 0 ? 0 : stars][1];
+    var per = [[0,0],[0,0],[0,0]];
+    results.forEach(function(r){ var lv = QUESTIONS[r.i].lv; per[lv][1] += 1; if (r.ok) per[lv][0] += 1; });
+    $('eLv').innerHTML = per.map(function(p, n){
+      return '<div><b class="num">' + p[0] + '/' + p[1] + '</b><span class="muted">' + LEVELS[n] + '</span></div>';
+    }).join('');
+    var miss = results.filter(function(r){ return !r.ok; });
+    var ul = $('eReview'); ul.innerHTML = '';
+    miss.forEach(function(r){
+      var q = QUESTIONS[r.i], li = document.createElement('li');
+      var a = document.createElement('b'); a.textContent = q.q;
+      var b = document.createElement('small'); b.textContent = 'Jawaban benar: ' + q.a[0];
+      var c = document.createElement('small'); c.textContent = q.e;
+      li.appendChild(a); li.appendChild(b); li.appendChild(c); ul.appendChild(li);
+    });
+    $('eReviewWrap').hidden = miss.length === 0;
+    var best = readBest();
+    if (best === null || isNaN(best) || score > best) saveBest(score);
+    showBest();
+    window.scrollTo(0, 0);
+  }
+  $('startQuiz').onclick = startQuiz;
+  $('again').onclick = startQuiz;
+  showBest();
+})();
+</script>
+
+</body></html>
